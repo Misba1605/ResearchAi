@@ -1,9 +1,10 @@
 import TemplateCard from "../components/TemplateCard"
-
+import { useNavigate } from "react-router-dom"
 
 
 function Templates() {
 
+  const navigate = useNavigate()
   const templates = [
     {
       title: "IEEE",
@@ -19,6 +20,9 @@ function Templates() {
     }
   ]
 
+    
+
+
   return (
     <div>
       <h2 className="text-4xl font-bold text-center mb-10">
@@ -26,12 +30,21 @@ function Templates() {
       </h2>
 
       <div className="grid md:grid-cols-3 gap-8">
-        {templates.map((template, index) => (
-          <TemplateCard
-            key={index}
-            title={template.title}
-            description={template.description}
+          {templates.map((template, index) => (
+            <div
+             key={index}
+             onClick={() => {
+              console.log(template.title)
+               navigate(`/editor/${template.title.toLowerCase()}`)
+              }}
+           className="cursor-pointer"
+          >
+           <TemplateCard
+             title={template.title}
+             description={template.description}
           />
+       </div>
+
         ))}
       </div>
     </div>

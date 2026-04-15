@@ -1,12 +1,13 @@
+import { Outlet } from "react-router-dom"
 import Navbar from "../components/Navbar"
+console.log("layout rendered");
 
-function MainLayout({ children }) {
+function MainLayout() {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <Navbar />
-      <div className="p-6">
-        {children}
-      </div>
+      <Outlet />
+
     </div>
   )
 }

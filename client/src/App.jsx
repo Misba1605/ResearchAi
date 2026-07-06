@@ -1,27 +1,46 @@
 import { Routes, Route } from "react-router-dom"
+import { AuthProvider } from "./context/AuthContext"
+import { ToastProvider } from "./context/ToastContext"
 import MainLayout from "./layouts/MainLayout"
 import Home from "./pages/Home"
 import Login from "./pages/Login"
+import Register from "./pages/Register"
 import Templates from "./pages/Templates"
 import Editor from "./pages/Editor"
-import Register from "./pages/Register"
+import MyDrafts from "./pages/MyDrafts"
+import AboutUs from "./pages/AboutUs"
+import ProtectedRoute from "./components/ProtectedRoute"
+import Toast from "./components/Toast"
 
 function App() {
   return (
-    <Routes>
-      {/* Layout wrapper */}
-      <Route path="/" element={<MainLayout />}>
-        
-        {/* Child routes */}
-        <Route index element={<Home />} />
-        <Route path="login" element={<Login />} />
-        <Route path="templates" element={<Templates />} />
-        <Route path="editor/:templateName" element={<Editor />} />
-        {/* <Route path="/editor" element={<Editor />} /> */}
-        <Route path="/register" element={<Register />} />
-        <Route path="/my-drafts" element={<MyDrafts />} />
-      </Route>
-    </Routes>
+    <AuthProvider>
+      <ToastProvider>
+        <Routes>
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<Home />} />
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+            <Route path="about" element={<AboutUs />} />
+
+            {/* Protected Routes */}
+            <Route path="templates" element={
+              <ProtectedRoute><Templates /></ProtectedRoute>
+            } />
+            <Route path="my-drafts" element={
+              <ProtectedRoute><MyDrafts /></ProtectedRoute>
+            } />
+            <Route path="editor/scratch" element={
+              <ProtectedRoute><Editor /></ProtectedRoute>
+            } />
+            <Route path="editor/:templateName" element={
+              <ProtectedRoute><Editor /></ProtectedRoute>
+            } />
+          </Route>
+        </Routes>
+        <Toast />
+      </ToastProvider>
+    </AuthProvider>
   )
 }
 

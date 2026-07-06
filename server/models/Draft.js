@@ -1,23 +1,53 @@
 import mongoose from "mongoose"
 
-const draftSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  },
-  title: {
-    type: String,
-    default: "Untitled"
-  },
-  content: {
-    type: String,
-    default: ""
-  },
-  template: {
-    type: String,
-    default: "IEEE"
-  }
-}, { timestamps: true })
+const ALLOWED_TEMPLATES = [
+  "scratch",
+  "ieee",
+  "acm",
+  "apa",
+  "scitepress",
+  "springer"
+]
 
-export default mongoose.model("Draft", draftSchema)
+const draftSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true
+    },
+
+    title: {
+      type: String,
+      trim: true,
+      default: "Untitled Paper",
+      maxlength: 150
+    },
+
+    content: {
+      type: String,
+      default: "",
+      maxlength: 8_000_000
+    },
+
+    template: {
+      type: String,
+      enum: ALLOWED_TEMPLATES,
+      default: "scratch"
+    }
+
+  },
+  {
+    timestamps: true
+  }
+)
+
+draftSchema.index({
+  userId: 1,
+  updatedAt: -1
+})
+
+const Draft = mongoose.model("Draft", draftSchema)
+
+export default Draft

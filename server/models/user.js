@@ -1,17 +1,34 @@
 import mongoose from "mongoose"
 
-const userSchema = new mongoose.Schema({    //creates a schema(structure in which data is stored)
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  password: {
-    type: String,
-    required: true
-  }
-})
+const userSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 2,
+      maxlength: 50
+    },
 
-const User = mongoose.model("User", userSchema)    //creates the actual model/collection from the given schema where user is the modelname 
+    email: {
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+      unique: true,
+      index: true
+    },
+
+    password: {
+      type: String,
+      required: true
+    }
+  },
+  {
+    timestamps: true
+  }
+)
+
+const User = mongoose.model("User", userSchema)
 
 export default User

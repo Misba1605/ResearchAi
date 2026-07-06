@@ -1,221 +1,567 @@
 import express from "express"
-import cors from "cors" 
-import mongoose from "mongoose"  
-import User from "./models/user.js" 
-import bcrypt from "bcrypt";
+import cors from "cors"
+import mongoose from "mongoose"
+import dotenv from "dotenv"
+import User from "./models/user.js"
+import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-import Draft from "./models/Draft.js";
+import Draft from "./models/Draft.js"
 
-const JWT_SECRET = "mysupersecretkey"
+dotenv.config()
 
-const app = express()      //backend server
- console.log("🚀 NEW SERVER FILE RUNNING");
-app.use(cors())      //cors communicates between frntend and bckend
-app.use(express.json())      //allows backend to read JSON data
+const requiredEnvVariables = [
+  "MONGODB_URI",
+  "JWT_SECRET",
+  "CLIENT_URL"
+]
 
-//backend server connection
-mongoose.connect("mongodb://Admin:M1234@ac-yxmr4hd-shard-00-00.kw5q67l.mongodb.net:27017,ac-yxmr4hd-shard-00-01.kw5q67l.mongodb.net:27017,ac-yxmr4hd-shard-00-02.kw5q67l.mongodb.net:27017/researchDB?ssl=true&replicaSet=atlas-z8g52c-shard-0&authSource=admin&appName=Cluster0")       //
-  .then(() => console.log("MongoDB connected ✅"))
-  .catch((err) => console.log(err))
+const missingEnvVariables = requiredEnvVariables.filter(
+  (variableName) => !process.env[variableName]
+)
+
+if (missingEnvVariables.length > 0) {
+  throw new Error(
+    `Missing required environment variables: ${missingEnvVariables.join(", ")}`
+  )
+}
+
+const JWT_SECRET = process.env.JWT_SECRET
+const CLIENT_URL = process.env.CLIENT_URL
+const PORT = process.env.PORT || 5000
+const app = express()
+
+app.use(
+  cors({
+    origin: CLIENT_URL,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  })
+)
+app.use(express.json({ limit: "10mb" }))
+
+// ─── MongoDB Connection ───────────────────────────────────────────────────────
+
+// ─── Auth Middleware ──────────────────────────────────────────────────────────
+const authMiddleware = (req, res, next) => {
+  const authorizationHeader = req.headers.authorization
+
+  if (
+    !authorizationHeader ||
+    !authorizationHeader.startsWith("Bearer ")
+  ) {
+    return res.status(401).json({
+      message: "Authentication required"
+    })
+  }
+
+  const token = authorizationHeader.slice(7).trim()
+
+  if (!token) {
+    return res.status(401).json({
+      message: "Authentication required"
+    })
+  }
+
+  try {
+    const decodedToken = jwt.verify(token, JWT_SECRET)
+
+    req.userId = decodedToken.userId
+
+    next()
+  } catch {
+    return res.status(401).json({
+      message: "Session expired or invalid"
+    })
+  }
+}
 
 
-app.get("/", (req, res) => {  //GET(api)
-  res.send("Server is running")    //res=response given to browser
-                                   //req=reaquesting from client
+const validateDraftId = (req, res, next) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({
+      message: "Invalid draft ID"
+    })
+  }
+
+  next()
+}
+
+
+
+// Validation helpers
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const normalizeEmail = (email) =>
+  typeof email === "string"
+    ? email.trim().toLowerCase()
+    : ""
+
+const createToken = (userId) =>
+  jwt.sign(
+    { userId },
+    JWT_SECRET,
+    { expiresIn: "7d" }
+  )
+
+const formatUser = (user) => ({
+  id: user._id,
+  username: user.username,
+  email: user.email
 })
 
-//user registration api 
+
+const ALLOWED_DRAFT_TEMPLATES = new Set([
+  "scratch",
+  "ieee",
+  "acm",
+  "apa",
+  "scitepress",
+  "springer"
+])
+
+const MAX_DRAFT_TITLE_LENGTH = 150
+const MAX_DRAFT_CONTENT_LENGTH = 8_000_000
+
+// ─── Health Check ─────────────────────────────────────────────────────────────
+app.get("/", (req, res) => {
+  res.json({ message: "Research Paper App Server is running 🚀" })
+})
+
+// ─── Register ─────────────────────────────────────────────────────────────────
 app.post("/api/register", async (req, res) => {
   try {
-    const { email, password } = req.body
+    const username =
+      typeof req.body.username === "string"
+        ? req.body.username.trim()
+        : ""
 
-    // Check if user exists
-    const existingUser = await User.findOne({ email })
+    const email = normalizeEmail(req.body.email)
 
-    if (existingUser) {
+    const password =
+      typeof req.body.password === "string"
+        ? req.body.password
+        : ""
+
+    if (!username || !email || !password) {
       return res.status(400).json({
-        message: "User already exists"
+        message: "Username, email and password are required"
       })
     }
 
-    //  Hash password
-    const hashedPassword = await bcrypt.hash(password, 10)
+    if (username.length < 2 || username.length > 50) {
+      return res.status(400).json({
+        message: "Username must be between 2 and 50 characters"
+      })
+    }
 
-    // 💾 Save user
+    if (!EMAIL_PATTERN.test(email)) {
+      return res.status(400).json({
+        message: "Enter a valid email address"
+      })
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: "Password must contain at least 6 characters"
+      })
+    }
+
+    const existingUser = await User.findOne({ email })
+
+    if (existingUser) {
+      return res.status(409).json({
+        message: "An account with this email already exists"
+      })
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12)
+
     const user = await User.create({
+      username,
       email,
       password: hashedPassword
     })
 
-    console.log("Saved user:", user)
+    const token = createToken(user._id)
 
-   const token = jwt.sign(
-     { userId: user._id },
-      JWT_SECRET,
-     { expiresIn: "1d" }
-)
-
-  res.json({
-    message: "User registered successfully",
-    token,
-    user 
- })
-
-  } catch (error) {
-    console.log("🔥 REGISTER ERROR:", error.message)
-
-    res.status(500).json({
-      message: "Error registering user"
+    res.status(201).json({
+      message: "Account created successfully",
+      token,
+      user: formatUser(user)
     })
-  }
-})
-
-
-
-   //middleware
-  const authMiddleware = (req, res, next) => {
-
-  try {
-
-    const token = req.headers.authorization
-
-    if (!token) {
-      return res.status(401).json({
-        message: "No token, access denied"
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: "An account with this email already exists"
       })
     }
 
+    console.error("Register error:", error.message)
 
-    // verify token
-    const decoded = jwt.verify(token, JWT_SECRET)
-
-    req.userId = decoded.userId
-
-    next()  // continue to next step
-
-  } catch (error) {
-    return res.status(401).json({
-      message: "Invalid token"
+    res.status(500).json({
+      message: "Unable to create account"
     })
   }
-
-}
-
-
-//login api
+})
+// ─── Login ────────────────────────────────────────────────────────────────────
 app.post("/api/login", async (req, res) => {
-   console.log("🔥 LOGIN API HIT");
   try {
+    const email = normalizeEmail(req.body.email)
 
-    const { email, password } = req.body
+    const password =
+      typeof req.body.password === "string"
+        ? req.body.password
+        : ""
 
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and password are required"
+      })
+    }
 
-    console.log("Email entered:", email)
-    // Check if user exists
+    if (!EMAIL_PATTERN.test(email)) {
+      return res.status(400).json({
+        message: "Enter a valid email address"
+      })
+    }
+
     const user = await User.findOne({ email })
-    console.log("User found:", user)
-
 
     if (!user) {
-      return res.status(400).json({
-        message: "User not found"
+      return res.status(401).json({
+        message: "Invalid email or password"
       })
     }
 
-    // Check password and match 
-   const isMatch = await bcrypt.compare(password, user.password)
+    const passwordMatches = await bcrypt.compare(
+      password,
+      user.password
+    )
 
-    if (!isMatch) {
-    return res.status(400).json({
-    message: "Invalid password"
-  })
-}
+    if (!passwordMatches) {
+      return res.status(401).json({
+        message: "Invalid email or password"
+      })
+    }
 
-    // Success
-
-    const token = jwt.sign(
-     { userId: user._id },
-    JWT_SECRET,
-     { expiresIn: "1d" }
-)
-     res.json({
-     message: "Login successful",
-     token,
-     user
-  })
-
-  } catch (error) {
-    res.status(500).json({
-      message: "Login error"
-    })
-  }
-
-})
-
-
-
-//middleware route
-  app.get("/api/profile", authMiddleware, (req, res) => {
+    const token = createToken(user._id)
 
     res.json({
-    message: "Protected data",
-    userId: req.userId
-  })
+      message: "Login successful",
+      token,
+      user: formatUser(user)
+    })
+  } catch (error) {
+    console.error("Login error:", error.message)
 
+    res.status(500).json({
+      message: "Unable to log in"
+    })
+  }
 })
 
- //draft api
- app.post("/api/drafts", async (req, res) => {
+// ─── Get Current User Profile ─────────────────────────────────────────────────
+app.get("/api/me", authMiddleware, async (req, res) => {
   try {
+    const user = await User.findById(req.userId).select(
+      "_id email username"
+    )
 
-    const { title, content, template } = req.body
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
 
-    // get token from headers
-     const authHeader = req.headers.authorization
+    res.json({
+            user: formatUser(user)
 
-    if (!authHeader) {
-      return res.status(401).json({
-        message: "No token, unauthorized"
+    })
+  } catch (error) {
+    console.error("Profile error:", error.message)
+
+    res.status(500).json({
+      message: "Error fetching profile"
+    })
+  }
+})
+
+// ─── Create Draft ─────────────────────────────────────────────────────────────
+app.post("/api/drafts", authMiddleware, async (req, res) => {
+  try {
+    const {
+      title: rawTitle,
+      content: rawContent,
+      template: rawTemplate
+    } = req.body
+
+    if (
+      rawTitle !== undefined &&
+      typeof rawTitle !== "string"
+    ) {
+      return res.status(400).json({
+        message: "Title must be text"
       })
     }
 
-    // verify token
-    const token = authHeader.split(" ")[1]
-    const decoded = jwt.verify(token, JWT_SECRET)
+    if (typeof rawContent !== "string") {
+      return res.status(400).json({
+        message: "Content is required and must be text"
+      })
+    }
 
-    const userId = decoded.userId
+    if (
+      rawTemplate !== undefined &&
+      typeof rawTemplate !== "string"
+    ) {
+      return res.status(400).json({
+        message: "Invalid template"
+      })
+    }
 
-    // create draft
-    const draft = await Draft.create({
-      userId,
+    const title =
+      rawTitle?.trim() || "Untitled Paper"
+
+    const content = rawContent
+
+    const template =
+      rawTemplate?.trim().toLowerCase() || "scratch"
+
+    if (title.length > MAX_DRAFT_TITLE_LENGTH) {
+      return res.status(400).json({
+        message: `Title cannot exceed ${MAX_DRAFT_TITLE_LENGTH} characters`
+      })
+    }
+
+    if (content.length > MAX_DRAFT_CONTENT_LENGTH) {
+      return res.status(400).json({
+        message: "Paper content is too large"
+      })
+    }
+
+    if (!ALLOWED_DRAFT_TEMPLATES.has(template)) {
+      return res.status(400).json({
+        message: "Invalid paper template"
+      })
+    }
+
+     const draft = await Draft.create({
+      userId: req.userId,
       title,
       content,
       template
     })
 
-    res.json({
-      message: "Draft saved",
+
+    res.status(201).json({
+      message: "Draft created",
       draft
     })
-
-    console.log("BODY:", req.body)
-    console.log("HEADERS:", req.headers.authorization)
-
   } catch (error) {
-    console.log("Draft Error", error.message)
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        message: "Invalid draft data"
+      })
+    }
+
+    console.error("Create draft error:", error.message)
+
     res.status(500).json({
-      message: "Error saving draft",
-       error: error.message
+      message: "Error creating draft"
     })
   }
 })
 
+// ─── Get All Drafts (for logged-in user) ──────────────────────────────────────
+app.get("/api/drafts", authMiddleware, async (req, res) => {
+  try {
+    const drafts = await Draft.find({ userId: req.userId })
+      .sort({ updatedAt: -1 })
+      .select("title template createdAt updatedAt")
+      
+    res.json(drafts)
+  } catch (error) {
+    console.error("Fetch drafts error:", error.message)
+    res.status(500).json({ message: "Error fetching drafts" })
+  }
+})
 
+// ─── Get Single Draft ─────────────────────────────────────────────────────────
+   app.get(
+    "/api/drafts/:id",
+    authMiddleware,
+    validateDraftId,
+    async (req, res) => {
+      try {
+       const draft = await Draft.findOne({ 
+         _id: req.params.id, userId: req.userId 
+         })
 
+       if (!draft) {
+        return res.status(404).json({
+          message: "Draft not found" })
+        }
 
-//server response
-app.listen(5000, () => {           //runs backend on port 5000
-  console.log("Server running on port 5000")     //runs when server starts
+       res.json(draft)
+       } catch (error) {
+         console.error("Fetch draft error:", error.message)
+
+         res.status(500).json({ message: "Error fetching draft" })
+      }
+   })
+
+// ─── Update Draft (Auto-save & Manual save) ───────────────────────────────────
+app.put(
+  "/api/drafts/:id",
+  authMiddleware,
+  validateDraftId,
+  async (req, res) => {
+    try {
+      const { title, content } = req.body
+      const hasTitle = Object.hasOwn(req.body, "title")
+      const hasContent = Object.hasOwn(req.body, "content")
+
+      if (!hasTitle && !hasContent) {
+        return res.status(400).json({
+          message: "Title or content is required"
+        })
+      }
+
+      if (hasTitle && typeof title !== "string") {
+        return res.status(400).json({
+          message: "Title must be text"
+        })
+      }
+
+      if (hasContent && typeof content !== "string") {
+        return res.status(400).json({
+          message: "Content must be text"
+        })
+      }
+
+      const updates = {}
+
+      if (hasTitle) {
+        const normalizedTitle =
+          title.trim() || "Untitled Paper"
+
+        if (
+          normalizedTitle.length >
+          MAX_DRAFT_TITLE_LENGTH
+        ) {
+          return res.status(400).json({
+            message: `Title cannot exceed ${MAX_DRAFT_TITLE_LENGTH} characters`
+          })
+        }
+
+        updates.title = normalizedTitle
+      }
+
+      if (hasContent) {
+        if (content.length > MAX_DRAFT_CONTENT_LENGTH) {
+          return res.status(400).json({
+            message: "Paper content is too large"
+          })
+        }
+
+        updates.content = content
+      }
+
+      const draft = await Draft.findOneAndUpdate(
+        {
+          _id: req.params.id,
+          userId: req.userId
+        },
+        updates,
+        {
+          returnDocument: "after",
+          runValidators: true
+        }
+      )
+
+      if (!draft) {
+        return res.status(404).json({
+          message: "Draft not found"
+        })
+      }
+
+      res.json({
+        message: "Draft saved",
+        draft
+      })
+    } catch (error) {
+      if (error.name === "ValidationError") {
+        return res.status(400).json({
+          message: "Invalid draft data"
+        })
+      }
+
+      console.error("Update draft error:", error.message)
+
+      res.status(500).json({
+        message: "Error updating draft"
+      })
+    }
+  }
+)
+
+// ─── Delete Draft ─────────────────────────────────────────────────────────────
+app.delete(
+  "/api/drafts/:id",
+  authMiddleware,
+  validateDraftId,
+  async (req, res) => {  
+    try {
+    const draft = await Draft.findOneAndDelete({
+       _id: req.params.id, 
+       userId: req.userId 
+      })
+    if (!draft) {
+      return res.status(404).json({ 
+        message: "Draft not found" })
+      }
+
+    // Log activity
+    
+    res.json({ message: "Draft deleted" })
+  } catch (error) {
+      console.error("Delete draft error:", error.message)
+
+    res.status(500).json({
+       message: "Error deleting draft" })
+  }
 })
 
 
+// const PORT = process.env.PORT || 5000;
+
+const startServer = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+
+    console.log("✅ MongoDB connected");
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("❌ MongoDB connection failed:", error.message)
+    process.exit(1);
+  }
+};
+
+startServer();
+
+
+
+
+
+
+// ─── Start Server ─────────────────────────────────────────────────────────────
+// app.listen(PORT, () => {
+//   console.log(`🚀 Server running on http://localhost:${PORT}`)
+// })
+
+
+
+// mongoose.connect(process.env.MONGODB_URI)
+//   .then(() => console.log("✅ MongoDB connected"))
+//   .catch((err) => console.log("❌ MongoDB error:", err.message))

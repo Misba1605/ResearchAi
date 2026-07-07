@@ -547,19 +547,3 @@ const startServer = async () => {
 };
 
 startServer();
-
-
-
-
-
-
-// ─── Start Server ─────────────────────────────────────────────────────────────
-// app.listen(PORT, () => {
-//   console.log(`🚀 Server running on http://localhost:${PORT}`)
-// })
-
-
-
-// mongoose.connect(process.env.MONGODB_URI)
-//   .then(() => console.log("✅ MongoDB connected"))
-//   .catch((err) => console.log("❌ MongoDB error:", err.message))

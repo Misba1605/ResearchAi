@@ -1,69 +1,162 @@
 import { useNavigate } from "react-router-dom"
-import { TEMPLATES } from "../constants/templates"
+
+const TEMPLATE_STYLES = {
+  ieee: {
+    label: "Engineering and technical research",
+    topBorder: "bg-blue-600",
+    iconBackground: "bg-blue-50",
+    iconColor: "text-blue-700",
+    sectionBackground: "bg-blue-50",
+    sectionText: "text-blue-700",
+    sectionBorder: "border-blue-100"
+  },
+
+  acm: {
+    label: "Computing research",
+    topBorder: "bg-emerald-600",
+    iconBackground: "bg-emerald-50",
+    iconColor: "text-emerald-700",
+    sectionBackground: "bg-emerald-50",
+    sectionText: "text-emerald-700",
+    sectionBorder: "border-emerald-100"
+  },
+
+  scitepress: {
+    label: "Conference-style research",
+    topBorder: "bg-violet-600",
+    iconBackground: "bg-violet-50",
+    iconColor: "text-violet-700",
+    sectionBackground: "bg-violet-50",
+    sectionText: "text-violet-700",
+    sectionBorder: "border-violet-100"
+  }
+}
+
+const DEFAULT_STYLE = {
+  label: "Guided paper structure",
+  topBorder: "bg-slate-600",
+  iconBackground: "bg-slate-100",
+  iconColor: "text-slate-700",
+  sectionBackground: "bg-slate-100",
+  sectionText: "text-slate-700",
+  sectionBorder: "border-slate-200"
+}
 
 export default function TemplateCard({ template }) {
   const navigate = useNavigate()
 
+  const style =
+    TEMPLATE_STYLES[template.id] || DEFAULT_STYLE
+
+  const openTemplate = () => {
+    navigate(`/editor/${template.id}`)
+  }
+
   return (
-    <div className="template-card glass-card rounded-2xl overflow-hidden group cursor-pointer"
-      onClick={() => navigate(`/editor/${template.id}`)}>
+    <button
+      type="button"
+      onClick={openTemplate}
+      className="template-card group flex h-full w-full flex-col overflow-hidden rounded-xl text-left"
+    >
+      <div className={`h-1.5 w-full ${style.topBorder}`} />
 
-      {/* Header gradient bar */}
-      <div className={`h-1.5 w-full bg-gradient-to-r ${template.color}`} />
+      <div className="flex flex-1 flex-col p-6">
 
-      <div className="p-6">
-        {/* Top row */}
-        <div className="flex items-start justify-between mb-3">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-xl font-bold text-white">{template.name}</h3>
-              {template.badge && (
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full bg-gradient-to-r ${template.color} text-white`}>
-                  {template.badge}
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-slate-400">{template.fullName}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500">
+              {style.label}
+            </p>
+
+            <h3 className="mt-2 text-xl font-bold text-slate-900">
+              {template.name}
+            </h3>
+
+            <p className="mt-1 text-xs font-medium text-slate-500">
+              {template.fullName}
+            </p>
           </div>
-          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${template.color} flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform`}>
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/>
+
+          <div
+            className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg ${style.iconBackground} ${style.iconColor}`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.8}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M7 3.75h7.5L19 8.25v12H7a2 2 0 0 1-2-2V5.75a2 2 0 0 1 2-2Z"
+              />
+
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M14 3.75v4.5h5M8.5 12h7M8.5 15.5h7"
+              />
             </svg>
           </div>
         </div>
 
         {/* Description */}
-        <p className="text-slate-400 text-sm leading-relaxed mb-4">{template.description}</p>
+        <p className="mt-5 text-sm leading-7 text-slate-600">
+          {template.description}
+        </p>
 
         {/* Sections */}
-        <div className="mb-5">
-          <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Sections included</p>
-          <div className="flex flex-wrap gap-1.5">
-            {template.sections.slice(0, 6).map((sec, i) => (
-              <span key={i} className="text-[11px] bg-slate-800/80 text-slate-300 px-2 py-0.5 rounded-md border border-slate-700/50">
-                {sec}
-              </span>
-            ))}
+        <div className="mt-6 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500">
+            Sections included
+          </p>
+
+          <div className="mt-3 flex flex-wrap gap-2">
+            {template.sections
+              .slice(0, 6)
+              .map((section) => (
+                <span
+                  key={section}
+                  className={`rounded-md border px-2.5 py-1 text-[11px] font-medium ${style.sectionBackground} ${style.sectionText} ${style.sectionBorder}`}
+                >
+                  {section}
+                </span>
+              ))}
+
             {template.sections.length > 6 && (
-              <span className="text-[11px] bg-slate-800/80 text-slate-400 px-2 py-0.5 rounded-md border border-slate-700/50">
+              <span className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-600">
                 +{template.sections.length - 6} more
               </span>
             )}
           </div>
         </div>
 
-        {/* Use Button */}
-        <button
-          id={`use-template-${template.id}`}
-          onClick={(e) => { e.stopPropagation(); navigate(`/editor/${template.id}`) }}
-          className={`w-full py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r ${template.color} hover:opacity-90 transition-all duration-200 flex items-center justify-center gap-2 group-hover:shadow-lg`}
-        >
-          Use This Template
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        {/* Action */}
+        <div className="mt-7 flex items-center justify-between border-t border-slate-200 pt-5">
+          <span className="text-sm font-semibold text-[#315c9b]">
+            Use this guide
+          </span>
+
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4 text-[#315c9b] transition-transform group-hover:translate-x-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m9 18 6-6-6-6"
+            />
           </svg>
-        </button>
+        </div>
       </div>
-    </div>
+    </button>
   )
 }

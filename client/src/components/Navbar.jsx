@@ -1,81 +1,143 @@
-import { Link, useNavigate, useLocation } from "react-router-dom"
-import { useAuth } from "../context/AuthContext"
 import { useState } from "react"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { useAuth } from "../context/AuthContext"
 
 function Navbar() {
   const { isLoggedIn, user, logout } = useAuth()
+
   const navigate = useNavigate()
   const location = useLocation()
+
   const [menuOpen, setMenuOpen] = useState(false)
 
   const handleLogout = () => {
     logout()
-    navigate("/")
     setMenuOpen(false)
+    navigate("/")
   }
 
-  const isActive = (path) => location.pathname === path
+  const handleNewPaper = () => {
+    setMenuOpen(false)
+    navigate("/editor/scratch")
+  }
 
-  const navLink = (to, label) => (
-    <Link
-      to={to}
-      onClick={() => setMenuOpen(false)}
-      className={`relative text-sm font-medium transition-all duration-200 pb-0.5
-        ${isActive(to)
-          ? "text-indigo-400"
-          : "text-slate-300 hover:text-white"
+  const isActive = (path) => {
+    return location.pathname === path
+  }
+
+  const navLink = (to, label) => {
+    const active = isActive(to)
+
+    return (
+      <Link
+        to={to}
+        onClick={() => setMenuOpen(false)}
+        className={`relative py-2 text-sm font-medium transition-colors ${
+          active
+            ? "text-[#315c9b]"
+            : "text-slate-600 hover:text-slate-950"
         }`}
-    >
-      {label}
-      {isActive(to) && (
-        <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-indigo-400 rounded-full" />
-      )}
-    </Link>
-  )
+      >
+        {label}
+
+        {active && (
+          <span className="absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-[#315c9b]" />
+        )}
+      </Link>
+    )
+  }
 
   return (
-    <nav className="sticky top-0 z-50 glass border-b border-white/[0.06]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-sm">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
 
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/>
+          {/* Brand */}
+          <Link
+            to="/"
+            onClick={() => setMenuOpen(false)}
+            className="flex items-center gap-2.5"
+          >
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#315c9b] text-white shadow-sm">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.8}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M7 3.75h7.5L19 8.25v12H7a2 2 0 0 1-2-2V5.75a2 2 0 0 1 2-2Z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M14 3.75v4.5h5M8.5 12h7M8.5 15.5h7"
+                />
               </svg>
             </div>
-            <span className="font-bold text-lg tracking-tight gradient-text">PaperFlow</span>
+
+            <div className="leading-tight">
+              <span className="block text-lg font-bold tracking-tight text-slate-900">
+                PaperFlow
+              </span>
+              <span className="hidden text-[10px] font-medium uppercase tracking-[0.14em] text-slate-400 sm:block">
+                Research workspace
+              </span>
+            </div>
           </Link>
 
-          {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-8">
+          {/* Desktop navigation */}
+          <div className="hidden items-center gap-8 md:flex">
             {navLink("/", "Home")}
-            {navLink("/templates", "Templates")}
+            {navLink("/templates", "Paper Guides")}
+
             {isLoggedIn && navLink("/my-drafts", "My Papers")}
           </div>
 
-          {/* Right — Auth */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Desktop actions */}
+          <div className="hidden items-center gap-3 md:flex">
             {isLoggedIn ? (
               <>
                 <button
-                  onClick={() => navigate("/editor/scratch")}
-                  className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/30"
+                  type="button"
+                  onClick={handleNewPaper}
+                  className="btn-primary gap-2 rounded-lg px-4 py-2 text-sm font-semibold"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 4v16m8-8H4"
+                    />
                   </svg>
+
                   New Paper
                 </button>
-                <div className="flex items-center gap-2 pl-3 border-l border-white/10">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-cyan-400 flex items-center justify-center text-xs font-bold text-white">
+
+                <div className="ml-1 flex items-center gap-2 border-l border-slate-200 pl-4">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#eaf1fa] text-xs font-bold text-[#315c9b]">
                     {user?.username?.[0]?.toUpperCase() || "U"}
                   </div>
-                  <span className="text-sm text-slate-300 max-w-[100px] truncate">{user?.username}</span>
+
+                  <span className="max-w-[110px] truncate text-sm font-medium text-slate-700">
+                    {user?.username}
+                  </span>
+
                   <button
+                    type="button"
                     onClick={handleLogout}
-                    className="text-xs text-slate-400 hover:text-red-400 transition-colors ml-1 px-2 py-1 rounded hover:bg-red-500/10"
+                    className="rounded-md px-2 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-red-50 hover:text-red-700"
                   >
                     Logout
                   </button>
@@ -83,52 +145,124 @@ function Navbar() {
               </>
             ) : (
               <>
-                <Link to="/login" className="text-sm text-slate-300 hover:text-white transition-colors font-medium">
+                <Link
+                  to="/login"
+                  className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-950"
+                >
                   Login
                 </Link>
+
                 <Link
                   to="/register"
-                  className="text-sm font-medium bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white px-4 py-2 rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/30"
+                  className="btn-primary rounded-lg px-4 py-2 text-sm font-semibold"
                 >
-                  Get Started
+                  Create Account
                 </Link>
               </>
             )}
           </div>
 
-          {/* Mobile hamburger */}
+          {/* Mobile button */}
           <button
-            className="md:hidden text-slate-300 hover:text-white p-2"
-            onClick={() => setMenuOpen(!menuOpen)}
+            type="button"
+            aria-label="Toggle navigation menu"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((current) => !current)}
+            className="rounded-lg border border-slate-200 p-2 text-slate-700 transition-colors hover:bg-slate-50 md:hidden"
           >
             {menuOpen ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
             )}
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden pb-4 pt-2 border-t border-white/[0.06] flex flex-col gap-3">
-            {navLink("/", "Home")}
-            {navLink("/templates", "Templates")}
-            {isLoggedIn && navLink("/my-drafts", "My Papers")}
-            {isLoggedIn ? (
-              <>
-                <button onClick={() => { navigate("/editor/scratch"); setMenuOpen(false) }}
-                  className="text-left text-sm text-indigo-400 font-medium">
-                  + New Paper
-                </button>
-                <button onClick={handleLogout} className="text-left text-sm text-red-400">Logout</button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" onClick={() => setMenuOpen(false)} className="text-sm text-slate-300">Login</Link>
-                <Link to="/register" onClick={() => setMenuOpen(false)} className="text-sm text-indigo-400">Get Started</Link>
-              </>
-            )}
+          <div className="border-t border-slate-200 py-4 md:hidden">
+            <div className="flex flex-col gap-2">
+              {navLink("/", "Home")}
+              {navLink("/templates", "Paper Guides")}
+
+              {isLoggedIn && navLink("/my-drafts", "My Papers")}
+
+              <div className="mt-2 border-t border-slate-200 pt-4">
+                {isLoggedIn ? (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#eaf1fa] text-xs font-bold text-[#315c9b]">
+                        {user?.username?.[0]?.toUpperCase() || "U"}
+                      </div>
+
+                      <span className="text-sm font-medium text-slate-700">
+                        {user?.username}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleNewPaper}
+                      className="btn-primary rounded-lg px-4 py-2.5 text-sm font-semibold"
+                    >
+                      New Paper
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="text-left text-sm font-medium text-red-700"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    <Link
+                      to="/login"
+                      onClick={() => setMenuOpen(false)}
+                      className="text-sm font-medium text-slate-700"
+                    >
+                      Login
+                    </Link>
+
+                    <Link
+                      to="/register"
+                      onClick={() => setMenuOpen(false)}
+                      className="btn-primary rounded-lg px-4 py-2.5 text-sm font-semibold"
+                    >
+                      Create Account
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>

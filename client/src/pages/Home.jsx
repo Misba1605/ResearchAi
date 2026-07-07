@@ -1,174 +1,282 @@
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 
 const features = [
   {
-    icon: "📄",
-    title: "4 Research Templates",
-    desc: "IEEE, ACM, Scitepress & Springer LNCS — all pre-formatted with the guided section structure."
+    number: "01",
+    title: "Guided Paper Structures",
+    description:
+      "Start with IEEE, ACM or SCITEPRESS section guides, or create a completely blank paper."
   },
   {
-    icon: "✏️",
-    title: "Rich Text Editor",
-    desc: "Bold, italic, fonts, sizes, colors, bullet lists, numbered lists, and more."
+    number: "02",
+    title: "Simple Rich Text Editor",
+    description:
+      "Write using headings, basic text formatting, lists, alignment and links."
   },
   {
-    icon: "☁️",
-    title: "Auto-Save Every 2s",
-    desc: "Never lose your work. Your paper is continuously saved to the cloud as you type."
+    number: "03",
+    title: "Automatic Draft Saving",
+    description:
+      "Your work is saved automatically while you write and can also be saved manually."
   },
   {
-    icon: "📥",
-    title: "Download as PDF",
-    desc: "Export your completed research paper as a clean, print-ready PDF with one click."
-  },
-  {
-    icon: "🔐",
-    title: "Secure & Private",
-    desc: "JWT-authenticated accounts. Your papers are private and only visible to you."
-  },
-  {
-    icon: "📚",
-    title: "Work History",
-    desc: "All your papers are stored in your account. Continue from where you left off, anytime."
+    number: "04",
+    title: "Personal Paper Workspace",
+    description:
+      "Create, reopen, continue and delete papers securely from your own account."
   }
 ]
 
-const stats = [
-  { value: "4", label: "Paper Templates" },
-  { value: "100%", label: "Free to Use" },
-  { value: "2s", label: "Auto-Save Interval" },
-  { value: "∞", label: "Papers Saved" }
+const steps = [
+  {
+    number: "1",
+    title: "Choose a structure",
+    description:
+      "Select a guided paper structure or begin with an empty document."
+  },
+  {
+    number: "2",
+    title: "Write section by section",
+    description:
+      "Replace the guidance text with your research content and format it clearly."
+  },
+  {
+    number: "3",
+    title: "Save and export",
+    description:
+      "Continue your work later from My Papers and export the completed draft as PDF."
+  }
 ]
 
 export default function Home() {
   const { isLoggedIn } = useAuth()
-  const navigate = useNavigate()
 
   return (
-    <div className="hero-bg min-h-screen">
+    <div className="hero-bg">
 
-      {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="relative max-w-7xl mx-auto px-6 pt-20 pb-16 text-center">
+      {/* Hero */}
+      <section className="page-container py-16 md:py-24">
+        <div className="grid items-center gap-14 lg:grid-cols-[1.08fr_0.92fr]">
 
-        {/* Badge */}
-      <div className="inline-flex items-center gap-2 glass text-indigo-300 text-xs font-semibold px-4 py-2 rounded-full mb-8 border border-indigo-500/20">
-       <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" />
-           Guided research paper workspace
-        </div>
-
-        {/* Headline */}
-      <h1 className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-6">
-      Build Your Research Paper{" "}
-       <span className="gradient-text block">with a Clear Structure</span>
-        </h1>
-
-       <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-          Choose a guided paper structure, write and format your content,
-          save drafts automatically, and export your paper as a PDF.
-       </p>
-
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-          <button
-            onClick={() => navigate(isLoggedIn ? "/editor/scratch" : "/register")}
-            className="btn-primary text-white font-semibold px-8 py-4 rounded-xl text-base shadow-xl shadow-indigo-500/20 flex items-center justify-center gap-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            {isLoggedIn ? "Create New Paper" : "Get Started Free"}
-          </button>
-
-          <button
-            onClick={() => navigate(isLoggedIn ? "/templates" : "/login")}
-            className="glass border border-indigo-500/30 hover:border-indigo-400/60 text-white font-semibold px-8 py-4 rounded-xl text-base transition-all duration-200 flex items-center justify-center gap-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h8" />
-            </svg>
-            Explore Templates
-          </button>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-          {stats.map((s, i) => (
-            <div key={i} className="glass-card rounded-2xl p-4 text-center">
-              <div className="text-3xl font-black gradient-text">{s.value}</div>
-              <div className="text-slate-400 text-xs mt-1">{s.label}</div>
+          <div>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#cbd9ea] bg-white px-4 py-2 text-xs font-semibold text-[#315c9b] shadow-sm">
+              <span className="h-2 w-2 rounded-full bg-[#315c9b]" />
+              Research-paper workspace for students
             </div>
-          ))}
-        </div>
-      </section>
 
-      {/* ── How It Works ──────────────────────────────────────── */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
-        <div className="text-center mb-14">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">How It Works</h2>
-          <p className="text-slate-400 max-w-lg mx-auto">Three simple steps to your finished research paper</p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            { step: "01", title: "Choose or Start Blank", desc: "Pick from IEEE, ACM, or Scitepress or start with a blank editor.", icon: "🗂️" },
-            { step: "02", title: "Write Your Content", desc: "Fill in your sections using the full-featured rich text editor with image & table support.", icon: "✍️" },
-            { step: "03", title: "Download as PDF", desc: "When you're done, download your finished paper as a clean, properly formatted PDF.", icon: "📥" }
-          ].map((item, i) => (
-            <div key={i} className="glass-card rounded-2xl p-8 relative overflow-hidden group hover:border-indigo-500/30 transition-all duration-300">
-              <div className="text-6xl font-black text-indigo-500/10 absolute top-4 right-6 select-none group-hover:text-indigo-500/20 transition-colors">
-                {item.step}
-              </div>
-              <div className="text-3xl mb-4">{item.icon}</div>
-              <h3 className="text-lg font-bold mb-2 text-white">{item.title}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+            <h1 className="max-w-3xl text-4xl font-extrabold leading-[1.1] tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
+              Build your research paper with a{" "}
+              <span className="text-[#315c9b]">
+                clear structure
+              </span>
+            </h1>
 
-      {/* ── Features ──────────────────────────────────────────── */}
-      <section className="max-w-7xl mx-auto px-6 py-10 pb-24">
-        <div className="text-center mb-14">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">Everything You Need</h2>
-          <p className="text-slate-400 max-w-lg mx-auto">All the tools to write, format, and export professional research papers</p>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {features.map((f, i) => (
-            <div
-              key={i}
-              className="glass-card rounded-2xl p-6 hover:border-indigo-500/30 transition-all duration-300 group"
-            >
-              <div className="text-3xl mb-3 group-hover:scale-110 transition-transform inline-block">{f.icon}</div>
-              <h3 className="font-semibold text-white mb-2">{f.title}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── CTA Banner ────────────────────────────────────────── */}
-      <section className="max-w-7xl mx-auto px-6 pb-24">
-        <div className="relative rounded-3xl overflow-hidden glass-card border border-indigo-500/20 p-12 text-center">
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/10 via-violet-600/10 to-cyan-600/10" />
-          <div className="relative">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to write your paper?</h2>
-            <p className="text-slate-400 mb-8 max-w-xl mx-auto">
-              Join thousands of students who use PaperFlow to write better papers, faster.
+            <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
+              Choose a guided paper structure, write and format your
+              content, save drafts automatically and export your paper as
+              a PDF.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to={isLoggedIn ? "/editor/scratch" : "/register"}
-                className="btn-primary text-white font-semibold px-8 py-4 rounded-xl text-base inline-block"
-              >
-                {isLoggedIn ? "Open Editor" : "Create Free Account"}
-              </Link>
+
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link
                 to="/templates"
-                className="glass border border-white/10 hover:border-white/20 text-white font-semibold px-8 py-4 rounded-xl text-base inline-block transition-all"
+                className="btn-primary rounded-lg px-6 py-3.5 text-sm font-semibold"
+              >
+                Choose a Paper Guide
+
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="ml-2 h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
                 >
-               View Paper Guides
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m9 18 6-6-6-6"
+                  />
+                </svg>
+              </Link>
+
+              <Link
+                to={isLoggedIn ? "/editor/scratch" : "/register"}
+                className="btn-secondary rounded-lg px-6 py-3.5 text-sm font-semibold"
+              >
+                {isLoggedIn
+                  ? "Start with Blank Paper"
+                  : "Create an Account"}
               </Link>
             </div>
+
+            <p className="mt-5 text-xs leading-5 text-slate-500">
+              Paper guides provide section-level writing support. They
+              are not official publisher templates or submission-ready
+              formatting files.
+            </p>
+          </div>
+
+          {/* Document preview */}
+          <div className="relative mx-auto w-full max-w-lg">
+            <div className="absolute -left-5 top-12 hidden h-24 w-24 rounded-full bg-[#dfeaf7] lg:block" />
+            <div className="absolute -right-6 bottom-8 hidden h-32 w-32 rounded-full border border-[#cbd9ea] lg:block" />
+
+            <div className="relative rounded-2xl border border-slate-200 bg-[#e8edf3] p-4 shadow-xl shadow-slate-900/5 sm:p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    Guided structure preview
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-slate-800">
+                    IEEE Paper Guide
+                  </p>
+                </div>
+
+                <span className="rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700">
+                  Saved
+                </span>
+              </div>
+
+              <div className="min-h-[430px] rounded-sm border border-slate-200 bg-white px-8 py-10 shadow-sm sm:px-12">
+                <div className="mx-auto mb-8 h-4 w-3/4 rounded bg-slate-900" />
+
+                <div className="mx-auto mb-3 h-2 w-1/2 rounded bg-slate-300" />
+                <div className="mx-auto mb-10 h-2 w-2/5 rounded bg-slate-200" />
+
+                <div className="mb-3 h-3 w-24 rounded bg-[#315c9b]" />
+                <div className="space-y-2">
+                  <div className="h-2 w-full rounded bg-slate-200" />
+                  <div className="h-2 w-full rounded bg-slate-200" />
+                  <div className="h-2 w-11/12 rounded bg-slate-200" />
+                </div>
+
+                <div className="mb-3 mt-8 h-3 w-32 rounded bg-[#315c9b]" />
+                <div className="space-y-2">
+                  <div className="h-2 w-full rounded bg-slate-200" />
+                  <div className="h-2 w-10/12 rounded bg-slate-200" />
+                  <div className="h-2 w-full rounded bg-slate-200" />
+                  <div className="h-2 w-8/12 rounded bg-slate-200" />
+                </div>
+
+                <div className="mb-3 mt-8 h-3 w-28 rounded bg-[#315c9b]" />
+                <div className="space-y-2">
+                  <div className="h-2 w-full rounded bg-slate-200" />
+                  <div className="h-2 w-9/12 rounded bg-slate-200" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="border-y border-slate-200 bg-white">
+        <div className="page-container py-20">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#315c9b]">
+              Core features
+            </p>
+
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+              Everything needed for a clear first draft
+            </h2>
+
+            <p className="mt-4 leading-7 text-slate-600">
+              PaperFlow keeps the workflow focused: choose a structure,
+              write your content, save your draft and export it.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-5 md:grid-cols-2">
+            {features.map((feature) => (
+              <article
+                key={feature.number}
+                className="rounded-xl border border-slate-200 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-[#b7c8dd] hover:shadow-lg hover:shadow-slate-900/5"
+              >
+                <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-lg bg-[#eaf1fa] text-sm font-bold text-[#315c9b]">
+                  {feature.number}
+                </div>
+
+                <h3 className="text-lg font-semibold text-slate-900">
+                  {feature.title}
+                </h3>
+
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  {feature.description}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="page-container py-20">
+        <div className="text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#315c9b]">
+            Simple workflow
+          </p>
+
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+            From structure to saved paper
+          </h2>
+
+          <p className="mx-auto mt-4 max-w-xl leading-7 text-slate-600">
+            The project focuses on a small and practical workflow that
+            students can understand immediately.
+          </p>
+        </div>
+
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {steps.map((step) => (
+            <article
+              key={step.number}
+              className="relative rounded-xl border border-slate-200 bg-white p-7"
+            >
+              <span className="mb-6 flex h-10 w-10 items-center justify-center rounded-full bg-[#315c9b] text-sm font-bold text-white">
+                {step.number}
+              </span>
+
+              <h3 className="text-lg font-semibold text-slate-900">
+                {step.title}
+              </h3>
+
+              <p className="mt-3 text-sm leading-7 text-slate-600">
+                {step.description}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="page-container pb-24">
+        <div className="rounded-2xl border border-[#cbd9ea] bg-[#eef4fb] px-6 py-12 text-center sm:px-12">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-950">
+            Start writing your paper
+          </h2>
+
+          <p className="mx-auto mt-4 max-w-xl leading-7 text-slate-600">
+            Choose a guided structure or begin with a blank paper and
+            build the sections yourself.
+          </p>
+
+          <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link
+              to="/templates"
+              className="btn-primary rounded-lg px-6 py-3 text-sm font-semibold"
+            >
+              View Paper Guides
+            </Link>
+
+            <Link
+              to={isLoggedIn ? "/my-drafts" : "/register"}
+              className="btn-secondary rounded-lg px-6 py-3 text-sm font-semibold"
+            >
+              {isLoggedIn ? "Open My Papers" : "Create Account"}
+            </Link>
           </div>
         </div>
       </section>

@@ -12,6 +12,7 @@ import {
 import ReactQuill from "react-quill-new"
 import "react-quill-new/dist/quill.snow.css"
 import html2pdf from "html2pdf.js"
+
 import apiClient from "../api/apiClient"
 import { useAuth } from "../context/AuthContext"
 import { useToast } from "../context/ToastContext"
@@ -24,6 +25,17 @@ const TOOLBAR_OPTIONS = [
   [{ align: [] }],
   ["link"],
   ["clean"]
+]
+
+const EDITOR_FORMATS = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "bullet",
+  "align",
+  "link"
 ]
 
 const SAVE_INTERVAL = 2000
@@ -40,6 +52,7 @@ export default function Editor() {
   const draftIdParam = searchParams.get("draftId")
 
   const navigate = useNavigate()
+
   const { logout } = useAuth()
   const { addToast } = useToast()
 
@@ -55,11 +68,13 @@ export default function Editor() {
   const [draftId, setDraftId] = useState(
     draftIdParam || null
   )
+
   const [status, setStatus] = useState("Ready")
   const [lastSaved, setLastSaved] = useState(null)
+
   const [initialised, setInitialised] = useState(false)
-  const [downloading, setDownloading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [downloading, setDownloading] = useState(false)
 
   const editorRef = useRef(null)
   const autoSaveTimer = useRef(null)
@@ -73,7 +88,12 @@ export default function Editor() {
     const initialiseEditor = async () => {
       setInitialised(false)
 
-     if (!draftIdParam && !isScratch && !template) {        addToast("Invalid paper template", "error")
+      if (
+        !draftIdParam &&
+        !isScratch &&
+        !template
+      ) {
+        addToast("Invalid paper template", "error")
         navigate("/templates", { replace: true })
         return
       }
@@ -143,7 +163,7 @@ export default function Editor() {
     template
   ])
 
-  // Create the first draft, then update the same draft.
+  // Create the first draft, then update that same draft.
   const saveDraft = useCallback(
     async ({ force = false } = {}) => {
       if (!initialised) {
@@ -180,7 +200,7 @@ export default function Editor() {
 
       savingRef.current = true
       setSaving(true)
-      setStatus("Saving…")
+      setStatus("Saving...")
 
       try {
         const payload = {
@@ -214,7 +234,7 @@ export default function Editor() {
 
         lastSavedSnapshotRef.current = snapshot
 
-        setStatus("Saved ✓")
+        setStatus("Saved")
         setLastSaved(new Date())
 
         return {
@@ -361,8 +381,6 @@ export default function Editor() {
     }
   }
 
-
-
   const handleLogout = () => {
     logout()
     navigate("/")
@@ -376,113 +394,70 @@ export default function Editor() {
         })
       : ""
 
-  const statusColor =
-    status === "Saved ✓"
-      ? "text-green-400"
-      : status.includes("fail")
-        ? "text-red-400"
-        : "text-yellow-400"
+  const paperTypeName = template
+    ? template.name
+    : "Blank Paper"
+
+  const paperTypeDescription = template
+    ? template.fullName
+    : "Create your own paper structure"
+
+  const getStatusStyle = () => {
+    if (status === "Saved") {
+      return {
+        container:
+          "border-emerald-200 bg-emerald-50 text-emerald-700",
+        dot: "bg-emerald-500"
+      }
+    }
+
+    if (status.includes("failed")) {
+      return {
+        container:
+          "border-red-200 bg-red-50 text-red-700",
+        dot: "bg-red-500"
+      }
+    }
+
+    if (
+      status === "Saving..." ||
+      status === "Unsaved changes"
+    ) {
+      return {
+        container:
+          "border-amber-200 bg-amber-50 text-amber-700",
+        dot: "bg-amber-500"
+      }
+    }
+
+    return {
+      container:
+        "border-slate-200 bg-slate-50 text-slate-600",
+      dot: "bg-slate-400"
+    }
+  }
+
+  const statusStyle = getStatusStyle()
 
   return (
-    <div className="flex flex-col h-screen bg-gray-950 overflow-hidden">
-      {/* Top Bar */}
-      <div className="flex-shrink-0 bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center gap-3 flex-wrap">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
-          title="Go back"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
+    <div className="flex h-screen flex-col overflow-hidden bg-[#e9edf2]">
 
-        <input
-          id="paper-title"
-          type="text"
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
-          placeholder="Enter paper title…"
-          className="flex-1 min-w-0 bg-slate-800/60 border border-slate-700 text-white text-sm font-medium rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 placeholder-slate-500"
-        />
+      {/* Editor header */}
+      <header className="flex-shrink-0 border-b border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center">
 
-        {template && (
-          <span
-            className={`hidden sm:inline-flex text-xs font-semibold text-white px-3 py-1.5 rounded-lg bg-gradient-to-r ${template.color}`}
-          >
-            {template.name}
-          </span>
-        )}
-
-        {isScratch && (
-          <span className="hidden sm:inline-flex text-xs font-semibold text-white px-3 py-1.5 rounded-lg bg-gradient-to-r from-slate-600 to-slate-700">
-            Blank Paper
-          </span>
-        )}
-
-        <div className="flex items-center gap-1.5">
-          {saving && (
-            <div className="w-3 h-3 border-2 border-yellow-400/40 border-t-yellow-400 rounded-full animate-spin" />
-          )}
-
-          <span className={`text-xs font-medium ${statusColor}`}>
-            {status}
-          </span>
-
-          {lastSaved && (
-            <span className="text-xs text-slate-600 hidden md:block">
-              at {formatTime(lastSaved)}
-            </span>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2 ml-auto">
-          <button
-            id="manual-save-btn"
-            onClick={handleManualSave}
-            disabled={saving}
-            className="flex items-center gap-1.5 bg-slate-700 hover:bg-slate-600 text-white text-xs font-medium px-3 py-2 rounded-lg transition-colors disabled:opacity-50"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-3.5 h-3.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
+          {/* Back and title */}
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              title="Go back"
+              aria-label="Go back"
+              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-950"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M8 7H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3m-1 4-3 3m0 0-3-3m3 3V4"
-              />
-            </svg>
-            Save
-          </button>
-
-          <button
-            id="download-pdf-btn"
-            onClick={handleDownload}
-            disabled={downloading}
-            className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-3 py-2 rounded-lg transition-colors disabled:opacity-50"
-          >
-            {downloading ? (
-              <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-3.5 h-3.5"
+                className="h-5 w-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -491,120 +466,225 @@ export default function Editor() {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M4 16v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1m-4-4-4 4m0 0-4-4m4 4V4"
+                  d="m15 19-7-7 7-7"
                 />
               </svg>
-            )}
-            {downloading ? "Generating…" : "PDF"}
-          </button>
+            </button>
 
+            <div className="min-w-0 flex-1">
+              <label
+                htmlFor="paper-title"
+                className="sr-only"
+              >
+                Paper title
+              </label>
 
-          <button
-            onClick={() => navigate("/my-drafts")}
-            className="hidden sm:flex items-center gap-1.5 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white text-xs font-medium px-3 py-2 rounded-lg transition-colors"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-3.5 h-3.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"
+              <input
+                id="paper-title"
+                type="text"
+                value={title}
+                onChange={(event) =>
+                  setTitle(event.target.value)
+                }
+                placeholder="Untitled Paper"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 outline-none transition focus:border-[#315c9b] focus:ring-2 focus:ring-[#315c9b]/10"
               />
-            </svg>
-            My Papers
-          </button>
+            </div>
+          </div>
 
-          <button
-            onClick={handleLogout}
-            className="hidden sm:flex items-center gap-1.5 border border-red-900/50 hover:border-red-500/50 text-red-400 hover:text-red-300 text-xs font-medium px-3 py-2 rounded-lg transition-colors"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-3.5 h-3.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
+          {/* Paper type and status */}
+          <div className="flex flex-wrap items-center gap-2 lg:flex-shrink-0">
+            <div className="hidden rounded-lg border border-[#cbd9ea] bg-[#eef4fb] px-3 py-2 sm:block">
+              <p className="text-xs font-semibold text-[#315c9b]">
+                {paperTypeName}
+              </p>
+            </div>
+
+            <div
+              className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold ${statusStyle.container}`}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17 16l4-4m0 0-4-4m4 4H7m6 4v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1"
-              />
-            </svg>
-            Logout
-          </button>
+              {saving ? (
+                <span className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              ) : (
+                <span
+                  className={`h-2 w-2 rounded-full ${statusStyle.dot}`}
+                />
+              )}
+
+              <span>{status}</span>
+
+              {lastSaved && (
+                <span className="hidden font-normal opacity-75 md:inline">
+                  at {formatTime(lastSaved)}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-wrap items-center gap-2 lg:flex-shrink-0">
+            <button
+              id="manual-save-btn"
+              type="button"
+              onClick={handleManualSave}
+              disabled={saving || !initialised}
+              className="btn-secondary gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 4h11l3 3v13H5V4Z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8 4v6h8V4M8 20v-6h8v6"
+                />
+              </svg>
+
+              Save
+            </button>
+
+            <button
+              id="download-pdf-btn"
+              type="button"
+              onClick={handleDownload}
+              disabled={downloading || !initialised}
+              className="btn-primary gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {downloading ? (
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 3v12m0 0 4-4m-4 4-4-4"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 19h14"
+                  />
+                </svg>
+              )}
+
+              {downloading
+                ? "Generating..."
+                : "Download PDF"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate("/my-drafts")}
+              className="hidden rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 sm:inline-flex"
+            >
+              My Papers
+            </button>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="hidden rounded-lg px-3 py-2 text-xs font-semibold text-slate-500 transition-colors hover:bg-red-50 hover:text-red-700 md:inline-flex"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Paper information */}
+      <div className="flex-shrink-0 border-b border-slate-200 bg-slate-50">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5 text-xs sm:px-6">
+          <div className="min-w-0">
+            <span className="font-semibold text-slate-700">
+              {paperTypeName}
+            </span>
+
+            <span className="hidden text-slate-500 sm:inline">
+              {" "}
+              · {paperTypeDescription}
+            </span>
+          </div>
+
+          <span className="flex-shrink-0 text-slate-500">
+            Autosaves after 2 seconds
+          </span>
         </div>
       </div>
 
-      {/* Editor Area */}
-      <div
-        className="flex-1 overflow-y-auto editor-scroll-area"
+      {/* Editor workspace */}
+      <main
         ref={editorRef}
+        className="editor-scroll-area flex-1 overflow-y-auto"
       >
-        <div className="max-w-[900px] mx-auto py-6">
+        <div className="mx-auto max-w-[930px] py-3 sm:py-6">
+          {!initialised && (
+            <div className="mb-4 flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#315c9b]/30 border-t-[#315c9b]" />
+              Opening paper...
+            </div>
+          )}
+
           <ReactQuill
             theme="snow"
             value={content}
             onChange={setContent}
-            modules={{ toolbar: TOOLBAR_OPTIONS }}
-            formats={[
-              "font",
-              "size",
-              "bold",
-              "italic",
-              "underline",
-              "strike",
-              "color",
-              "background",
-              "script",
-              "header",
-              "align",
-              "list",
-              "bullet",
-              "indent",
-              "blockquote",
-              "code-block",
-              "link",
-              "clean"
-            ]}
+            readOnly={!initialised}
+            modules={{
+              toolbar: TOOLBAR_OPTIONS
+            }}
+            formats={EDITOR_FORMATS}
             placeholder={
               isScratch
-                ? "Start writing your research paper…"
-                : "Add your content to each section below…"
+                ? "Start writing your research paper..."
+                : "Replace the guidance under each section with your content..."
             }
-            style={{ height: "auto" }}
           />
         </div>
-      </div>
+      </main>
 
-      {/* Bottom Status Bar */}
-      <div className="flex-shrink-0 bg-slate-900/90 border-t border-slate-800 px-4 py-1.5 flex items-center justify-between text-xs text-slate-500">
-        <span>
-          {template
-            ? `${template.fullName} format`
-            : "Blank Paper"}
+      {/* Bottom status */}
+      <footer className="flex-shrink-0 border-t border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2 text-xs sm:px-6">
+          <span className="truncate text-slate-500">
+            {draftId
+              ? "Saved paper"
+              : "New paper"}
+          </span>
 
-          {draftId && (
-            <span className="ml-3 text-slate-600">
-              ID: {draftId.slice(-6)}
-            </span>
-          )}
-        </span>
+          <span
+            className={`flex-shrink-0 font-medium ${
+              status === "Saved"
+                ? "text-emerald-700"
+                : status.includes("failed")
+                  ? "text-red-700"
+                  : "text-slate-600"
+            }`}
+          >
+            {status}
 
-        <span className={statusColor}>
-          {status}
-          {lastSaved
-            ? ` · ${formatTime(lastSaved)}`
-            : ""}
-        </span>
-      </div>
+            {lastSaved
+              ? ` · ${formatTime(lastSaved)}`
+              : ""}
+          </span>
+        </div>
+      </footer>
     </div>
   )
 }

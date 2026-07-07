@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom"
+import { Routes, Route, Navigate } from "react-router-dom"
 import { AuthProvider } from "./context/AuthContext"
 import { ToastProvider } from "./context/ToastContext"
 import MainLayout from "./layouts/MainLayout"
@@ -8,7 +8,6 @@ import Register from "./pages/Register"
 import Templates from "./pages/Templates"
 import Editor from "./pages/Editor"
 import MyDrafts from "./pages/MyDrafts"
-import AboutUs from "./pages/AboutUs"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Toast from "./components/Toast"
 
@@ -21,7 +20,6 @@ function App() {
             <Route index element={<Home />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
-            <Route path="about" element={<AboutUs />} />
 
             {/* Protected Routes */}
             <Route path="templates" element={
@@ -36,6 +34,7 @@ function App() {
             <Route path="editor/:templateName" element={
               <ProtectedRoute><Editor /></ProtectedRoute>
             } />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
         <Toast />

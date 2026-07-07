@@ -45,13 +45,12 @@ function Navbar() {
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/>
               </svg>
             </div>
-            <span className="font-bold text-lg tracking-tight gradient-text">ResearchAI</span>
+            <span className="font-bold text-lg tracking-tight gradient-text">PaperFlow</span>
           </Link>
 
           {/* Desktop Nav Links */}
           <div className="hidden md:flex items-center gap-8">
             {navLink("/", "Home")}
-            {navLink("/about", "About Us")}
             {navLink("/templates", "Templates")}
             {isLoggedIn && navLink("/my-drafts", "My Papers")}
           </div>
@@ -114,7 +113,6 @@ function Navbar() {
         {menuOpen && (
           <div className="md:hidden pb-4 pt-2 border-t border-white/[0.06] flex flex-col gap-3">
             {navLink("/", "Home")}
-            {navLink("/about", "About Us")}
             {navLink("/templates", "Templates")}
             {isLoggedIn && navLink("/my-drafts", "My Papers")}
             {isLoggedIn ? (

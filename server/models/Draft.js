@@ -4,9 +4,7 @@ const ALLOWED_TEMPLATES = [
   "scratch",
   "ieee",
   "acm",
-  "apa",
-  "scitepress",
-  "springer"
+  "scitepress"
 ]
 
 const draftSchema = new mongoose.Schema(

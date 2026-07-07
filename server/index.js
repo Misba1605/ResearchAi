@@ -114,9 +114,7 @@ const ALLOWED_DRAFT_TEMPLATES = new Set([
   "scratch",
   "ieee",
   "acm",
-  "apa",
-  "scitepress",
-  "springer"
+  "scitepress"
 ])
 
 const MAX_DRAFT_TITLE_LENGTH = 150

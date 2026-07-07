@@ -67,7 +67,7 @@ export default function Register() {
           </div>
 
           <h1 className="text-2xl font-bold text-center text-white mb-1">Create your account</h1>
-          <p className="text-slate-400 text-sm text-center mb-8">Join ResearchAI and start writing better papers</p>
+          <p className="text-slate-400 text-sm text-center mb-8">Join PaperFlow and start writing better papers</p>
 
           <form onSubmit={handleRegister} className="space-y-4">
 

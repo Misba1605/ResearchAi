@@ -12,13 +12,13 @@ export default function Templates() {
         {/* Header */}
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 glass text-indigo-300 text-xs font-semibold px-4 py-2 rounded-full mb-6 border border-indigo-500/20">
-            <span className="text-base">📋</span> Research Paper Templates
+            <span className="text-base">📋</span> Research Paper Structure
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
-            Choose Your <span className="gradient-text">Template</span>
+            Choose Your <span className="gradient-text">Template Guide</span>
           </h1>
           <p className="text-slate-400 text-lg max-w-xl mx-auto">
-            Each template comes pre-filled with all the required sections for that publication format.
+            Each template comes with a guide of pre-filled with all the required sections for that publication format.
             Just add your content.
           </p>
         </div>
@@ -56,10 +56,20 @@ export default function Templates() {
         )}
 
         {/* Bottom note */}
+       {/* Bottom note */}
         <div className="text-center mt-14 text-slate-500 text-sm">
-          <p>All templates follow official publication guidelines. Sections are pre-structured — just fill in your content.</p>
-        </div>
+        <p>
+        These guides provide section-level writing support.
+        They are not official publisher templates or submission-ready formatting files.
+        </p>
+       </div>
       </div>
     </div>
+
+   
+
   )
+
 }
+
+ 

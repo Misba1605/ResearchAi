@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import apiClient from "../api/apiClient"
 import { useNavigate } from "react-router-dom"
 import { useToast } from "../context/ToastContext"
@@ -10,24 +10,35 @@ function MyDrafts() {
   const navigate = useNavigate()
   const { addToast } = useToast()
 
-  const fetchDrafts = useCallback(async () => {
-  try {
-    setLoading(true)
+useEffect(() => {
+  let isCancelled = false
 
-    const res = await apiClient.get("/drafts")
+  const loadDrafts = async () => {
+    try {
+      const response = await apiClient.get("/drafts")
 
-    setDrafts(res.data)
-  } catch (error) {
-    console.error("Error fetching drafts:", error)
-    addToast("Failed to load your papers", "error")
-  } finally {
-    setLoading(false)
+      if (!isCancelled) {
+        setDrafts(response.data)
+      }
+    } catch (error) {
+      console.error("Error fetching drafts:", error)
+
+      if (!isCancelled) {
+        addToast("Failed to load your papers", "error")
+      }
+    } finally {
+      if (!isCancelled) {
+        setLoading(false)
+      }
+    }
+  }
+
+  loadDrafts()
+
+  return () => {
+    isCancelled = true
   }
 }, [addToast])
-
-  useEffect(() => {
-    fetchDrafts()
-}, [fetchDrafts])
 
   const handleDelete = async (e, draftId) => {
     e.stopPropagation()
@@ -64,28 +75,26 @@ function MyDrafts() {
   }
 
   const getTemplateColor = (template) => {
-    const colors = {
-      ieee: "from-blue-500 to-blue-700",
-      acm: "from-red-500 to-orange-600",
-      apa: "from-amber-500 to-yellow-600",
-      scitepress: "from-green-500 to-teal-600",
-      springer: "from-purple-500 to-indigo-600",
-      scratch: "from-slate-500 to-slate-700"
-    }
-    return colors[template] || "from-slate-500 to-slate-700"
+  const colors = {
+    ieee: "from-blue-500 to-indigo-600",
+    acm: "from-emerald-500 to-teal-600",
+    scitepress: "from-violet-500 to-purple-600",
+    scratch: "from-slate-500 to-slate-700"
   }
 
-  const getTemplateName = (template) => {
-    const names = {
-      ieee: "IEEE",
-      acm: "ACM",
-      apa: "APA",
-      scitepress: "Scitepress",
-      springer: "Springer",
-      scratch: "Blank Paper"
-    }
-    return names[template] || template
+  return colors[template] || "from-slate-500 to-slate-700"
+}
+
+ const getTemplateName = (template) => {
+  const names = {
+    ieee: "IEEE Paper Guide",
+    acm: "ACM Paper Guide",
+    scitepress: "SCITEPRESS Paper Guide",
+    scratch: "Blank Paper"
   }
+
+  return names[template] || "Saved Paper"
+}
 
   return (
     <div className="hero-bg min-h-screen">

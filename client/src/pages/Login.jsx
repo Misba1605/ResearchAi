@@ -129,7 +129,7 @@ export default function Login() {
           </form>
 
           <p className="text-center text-sm text-slate-400 mt-6">
-            New to ResearchAI?{" "}
+            New to PaperFlow?{" "}
             <Link to="/register" className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
               Create an account
             </Link>

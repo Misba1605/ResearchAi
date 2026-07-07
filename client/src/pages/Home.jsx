@@ -5,12 +5,12 @@ const features = [
   {
     icon: "📄",
     title: "4 Research Templates",
-    desc: "IEEE, ACM, Scitepress & Springer LNCS — all pre-formatted with the correct section structure."
+    desc: "IEEE, ACM, Scitepress & Springer LNCS — all pre-formatted with the guided section structure."
   },
   {
     icon: "✏️",
     title: "Rich Text Editor",
-    desc: "Bold, italic, fonts, sizes, colors, bullet lists, numbered lists, image insertion and more."
+    desc: "Bold, italic, fonts, sizes, colors, bullet lists, numbered lists, and more."
   },
   {
     icon: "☁️",
@@ -52,21 +52,21 @@ export default function Home() {
       <section className="relative max-w-7xl mx-auto px-6 pt-20 pb-16 text-center">
 
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 glass text-indigo-300 text-xs font-semibold px-4 py-2 rounded-full mb-8 border border-indigo-500/20">
-          <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" />
-          Built for College Students &amp; Researchers
+      <div className="inline-flex items-center gap-2 glass text-indigo-300 text-xs font-semibold px-4 py-2 rounded-full mb-8 border border-indigo-500/20">
+       <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" />
+           Guided research paper workspace
         </div>
 
         {/* Headline */}
-        <h1 className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-6">
-          Create Research Papers{" "}
-          <span className="gradient-text block">Without the Stress</span>
+      <h1 className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-6">
+      Build Your Research Paper{" "}
+       <span className="gradient-text block">with a Clear Structure</span>
         </h1>
 
-        <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-          Professional research paper templates for IEEE, ACM, Scitepress &amp; Springer LNCS.
-          Write, auto-save, and download as PDF — all in one place.
-        </p>
+       <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+          Choose a guided paper structure, write and format your content,
+          save drafts automatically, and export your paper as a PDF.
+       </p>
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -110,7 +110,7 @@ export default function Home() {
         </div>
         <div className="grid md:grid-cols-3 gap-6">
           {[
-            { step: "01", title: "Choose or Start Blank", desc: "Pick from IEEE, ACM, Scitepress, or Springer LNCS — or start with a blank editor.", icon: "🗂️" },
+            { step: "01", title: "Choose or Start Blank", desc: "Pick from IEEE, ACM, or Scitepress or start with a blank editor.", icon: "🗂️" },
             { step: "02", title: "Write Your Content", desc: "Fill in your sections using the full-featured rich text editor with image & table support.", icon: "✍️" },
             { step: "03", title: "Download as PDF", desc: "When you're done, download your finished paper as a clean, properly formatted PDF.", icon: "📥" }
           ].map((item, i) => (
@@ -153,7 +153,7 @@ export default function Home() {
           <div className="relative">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to write your paper?</h2>
             <p className="text-slate-400 mb-8 max-w-xl mx-auto">
-              Join thousands of students who use ResearchAI to write better papers, faster.
+              Join thousands of students who use PaperFlow to write better papers, faster.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -163,10 +163,10 @@ export default function Home() {
                 {isLoggedIn ? "Open Editor" : "Create Free Account"}
               </Link>
               <Link
-                to="/about"
+                to="/templates"
                 className="glass border border-white/10 hover:border-white/20 text-white font-semibold px-8 py-4 rounded-xl text-base inline-block transition-all"
-              >
-                Learn More
+                >
+               View Paper Guides
               </Link>
             </div>
           </div>

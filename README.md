@@ -4,6 +4,13 @@ PaperFlow is a MERN-based web application that helps students create, save and m
 
 Users can choose an IEEE, ACM or SCITEPRESS section guide, start with a blank paper, write using a rich-text editor, save drafts automatically and export papers as PDF.
 
+## Live Demo
+
+- Application: https://your-stable-vercel-domain.vercel.app
+- Backend API: https://paperflow-opfj.onrender.com
+
+> The backend uses Render's free tier, so the first request after inactivity may take a few seconds.
+
 ## Features
 
 - User registration and login

@@ -1,4 +1,5 @@
-# PaperFlow
+# CiteNest
+
 
 PaperFlow is a MERN-based web application that helps students create, save and manage research-paper drafts.
 

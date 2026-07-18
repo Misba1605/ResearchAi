@@ -1,7 +1,6 @@
 # CiteNest
 
-
-PaperFlow is a MERN-based web application that helps students create, save and manage research-paper drafts.
+CiteNest is a MERN-based web application that helps students create, save and manage research-paper drafts.
 
 Users can choose an IEEE, ACM or SCITEPRESS section guide, start with a blank paper, write using a rich-text editor, save drafts automatically and export papers as PDF.
 

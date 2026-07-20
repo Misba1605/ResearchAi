@@ -122,7 +122,7 @@ const MAX_DRAFT_CONTENT_LENGTH = 8_000_000
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/", (req, res) => {
-  res.json({ message: "Paper Flow App Server is running 🚀" })
+  res.json({ message: "CiteNest App Server is running 🚀" })
 })
 
 // ─── Register ─────────────────────────────────────────────────────────────────

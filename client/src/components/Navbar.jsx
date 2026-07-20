@@ -82,7 +82,7 @@ function Navbar() {
 
             <div className="leading-tight">
               <span className="block text-lg font-bold tracking-tight text-slate-900">
-                PaperFlow
+                CiteNest
               </span>
               <span className="hidden text-[10px] font-medium uppercase tracking-[0.14em] text-slate-400 sm:block">
                 Research workspace

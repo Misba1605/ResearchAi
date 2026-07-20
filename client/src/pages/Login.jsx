@@ -105,7 +105,7 @@ export default function Login() {
                 </div>
 
                 <span className="text-xl font-bold text-slate-950">
-                  PaperFlow
+                  CiteNest
                 </span>
               </Link>
 
@@ -189,7 +189,7 @@ export default function Login() {
                 </div>
 
                 <span className="text-lg font-bold text-slate-950">
-                  PaperFlow
+                  CiteNest
                 </span>
               </Link>
 
@@ -308,7 +308,7 @@ export default function Login() {
               </form>
 
               <p className="mt-7 text-center text-sm text-slate-600">
-                New to PaperFlow?{" "}
+                New to CiteNest?{" "}
                 <Link
                   to="/register"
                   className="font-semibold text-[#315c9b] hover:text-[#274b80]"

@@ -131,7 +131,7 @@ export default function Register() {
                 </div>
 
                 <span className="text-xl font-bold text-slate-950">
-                  PaperFlow
+                  CiteNest
                 </span>
               </Link>
 
@@ -218,7 +218,7 @@ export default function Register() {
                 </div>
 
                 <span className="text-lg font-bold text-slate-950">
-                  PaperFlow
+                  CiteNest
                 </span>
               </Link>
 

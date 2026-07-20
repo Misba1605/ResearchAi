@@ -184,7 +184,7 @@ export default function Home() {
             </h2>
 
             <p className="mt-4 leading-7 text-slate-600">
-              PaperFlow keeps the workflow focused: choose a structure,
+              CiteNest keeps the workflow focused: choose a structure,
               write your content, save your draft and export it.
             </p>
           </div>

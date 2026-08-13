@@ -6,7 +6,7 @@ Users can choose an IEEE, ACM or SCITEPRESS section guide, start with a blank pa
 
 ## Live Demo
 
-- Application: [https://your-stable-vercel-domain.vercel.app](https://paperflow-8s0bgymbn-misba1605s-projects.vercel.app/)
+- Application: [https://your-stable-vercel-domain.vercel.app](https://citenest-rho.vercel.app/)
 - Backend API: https://paperflow-opfj.onrender.com
 
 > The backend uses Render's free tier, so the first request after inactivity may take a few seconds.
